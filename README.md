@@ -1,1 +1,1 @@
-# Miniprojekt-Pok-mon
+# Miniprojekt-Pokemon
