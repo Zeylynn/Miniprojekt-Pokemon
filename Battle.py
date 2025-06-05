@@ -1,16 +1,24 @@
+import api_handler as API
+import pokemon_builder as PokeBuild
 import random
 
-class Pokemon:
-    def __init__(self, name, stats, moves):
-        self.name = name
-        self.stats = stats  #Dictionary 
-        self.moves = moves
-
 class Kampf:
-    def __init__(self, pokemon1, pokemon2):
-        self.pokemon1 = pokemon1
-        self.pokemon2 = pokemon2
+    def __init__(self):
+        # Host fangt immer an
+        self.trainerHost = []
+        self.trainerClient = []
+
+        self.api_handler = API.API_Handler()
+        self.builder = PokeBuild.PokemonBuilder(self.api_handler)
+
+        self.createPlayerTeams()
         
+    def createPlayerTeams(self):
+        # TODO auf nationalen Pokedex umstellen damit ich keine Mega Formen etc. habe
+        for i in range(6):
+            self.trainerHost.append(self.builder.build(str(random.randint(1, 1000))))
+            self.trainerClient.append(self.builder.build(str(random.randint(1, 1000)))) 
+
     def bestimme_angreifer(self):
         # Speed Werte aus den Stats rausziehen yk
         speed1 = self.pokemon1.stats["speed"]
@@ -76,33 +84,5 @@ class Kampf:
     def apply_damage(self, defender, damage):
         defender.stats["hp"] = max(0, defender.stats["hp"] - damage)
 
-
-# Bsp:
-pikachu_stats = {
-    "hp": 35,
-    "attack": 55,
-    "defense": 40,
-    "special-attack": 50,
-    "special-defense": 50,
-    "speed": 90
-}
-pikachu_moves = ["Donnerschock", "Ruckzuckhieb", "Donnerwelle", "Agilität"]
-
-#Bsp2:
-glumanda_stats = {
-    "hp": 39,
-    "attack": 52,
-    "defense": 43,
-    "special-attack": 60,
-    "special-defense": 50,
-    "speed": 65
-}
-glumanda_moves = ["Glut", "Kratzer", "Rauchwolke", "Drachenrutsch"]
-
-# Pokemon erstellen
-pikachu = Pokemon("Pikachu", pikachu_stats, pikachu_moves)
-glumanda = Pokemon("Glumanda", glumanda_stats, glumanda_moves)
-
-# Kampf starten
-kampf = Kampf(pikachu, glumanda)
+kampf = Kampf()
 kampf.start()

@@ -8,6 +8,7 @@ class PokemonBuilder:
     def build(self, name):
         data = self.api_handler.get_pokemon_data(name)
 
+        name = data["name"]         # falls man mit zahlen statt namen builded
         # Daten aus Dictionary "filtern"
         sprite = data["sprites"]["front_default"]
 
@@ -25,7 +26,7 @@ class PokemonBuilder:
 
         # Objekt erstellen
         pokemon = Pokemon.Pokemon()
-        pokemon.set_data(sprite, types, stats, selected_moves)
+        pokemon.set_data(name, sprite, types, stats, selected_moves)
         return pokemon
 
     def get_random_attacks(self, data, count):

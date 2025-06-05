@@ -1,5 +1,6 @@
 class Pokemon:
     def __init__(self):
+        self.__name = None
         self.__sprite = None
         self.__type = None          # TODO Soll ich doppeltypen unterstützen? => Glaub nicht sonst Liste statt string
         self.__attacks = []
@@ -12,6 +13,9 @@ class Pokemon:
         self.__sp_defense = None    #5
         self.__speed = None         #6
         
+    def get_name(self):
+        return self.__name
+
     def get_sprite(self):
         return self.__sprite
 
@@ -32,7 +36,8 @@ class Pokemon:
         return self.__attacks
 
     # zum setzen(daten sind ja privat)
-    def set_data(self, sprite, types, stats, attacks):
+    def set_data(self, name, sprite, types, stats, attacks):
+        self.__name = name
         self.__sprite = sprite
         self.__type = types
         self.__hp = stats["hp"]
