@@ -1,14 +1,14 @@
-import api_handler as API
 import pokemon_obj as Pokemon
 import random
 
 class PokemonBuilder:
-    def __init__(self):
-        self.api_handler = API.API_Handler()
+    def __init__(self, handler):
+        self.api_handler = handler  # Damit man den Handler durch einen Fake-Handler ersetzen soll
 
     def build(self, name):
         data = self.api_handler.get_pokemon_data(name)
 
+        name = data["name"]         # falls man mit zahlen statt namen builded
         # Daten aus Dictionary "filtern"
         sprite = data["sprites"]["front_default"]
 
@@ -26,7 +26,7 @@ class PokemonBuilder:
 
         # Objekt erstellen
         pokemon = Pokemon.Pokemon()
-        pokemon.set_data(sprite, types, stats, selected_moves)
+        pokemon.set_data(name, sprite, types, stats, selected_moves)
         return pokemon
 
     def get_random_attacks(self, data, count):
