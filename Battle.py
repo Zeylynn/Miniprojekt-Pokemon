@@ -17,20 +17,32 @@ class Kampf:
         speed2 = self.pokemon2.stats["speed"]
         
         if speed1 > speed2:
-            return self.pokemon1, self.pokemon2
+            return 1
         elif speed2 > speed1:
-            return self.pokemon2, self.pokemon1
+            return 2
         else:
-            return random.choice([(self.pokemon1, self.pokemon2), (self.pokemon2, self.pokemon1)])
+            return random.choice([1,2])
 
     def start(self):
         print(f"Kampf startet zwischen {self.pokemon1.name} und {self.pokemon2.name}!\n")
-        
-        while True:
-            attacker1, attacker2 = self.bestimme_angreifer()
-            self.display_status()
+        attacker1 = self.pokemon1
+        attacker2 = self.pokemon2  
 
-            # Erster Angrif
+        while True:
+             
+            Who = self.bestimme_angreifer()
+            self.display_status()
+            Attacke = self.attack(attacker1, attacker2, Who)
+            if Who == 1:
+                Who = 2
+            else:
+                Who = 1 
+            Attacke = self.attack(attacker1, attacker2, Who)   
+            
+                 
+    def attack(self, attacker1, attacker2, Line ):
+        # Erster Angrif
+        if Line == 1:
             move1 = self.choose_attack(attacker1)
             damage1 = self.calculate_damage(attacker1, attacker2, move1)
             self.apply_damage(attacker2, damage1)
@@ -38,8 +50,8 @@ class Kampf:
 
             if attacker2.stats["hp"] <= 0:
                 print(f"{attacker2.name} wurde besiegt! {attacker1.name} gewinnt!\n")
-                break
 
+        if Line == 2:
             # Zweiter Angriff
             move2 = self.choose_attack(attacker2)
             damage2 = self.calculate_damage(attacker2, attacker1, move2)
@@ -48,7 +60,7 @@ class Kampf:
 
             if attacker1.stats["hp"] <= 0:
                 print(f"{attacker1.name} wurde besiegt! {attacker2.name} gewinnt!\n")
-                break
+                
 
     def display_status(self):
         print(f"{self.pokemon1.name}: {self.pokemon1.stats['hp']} HP")

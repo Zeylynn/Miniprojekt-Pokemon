@@ -1,4 +1,4 @@
 *.docx
 *.txt
 __pycache__
-test.py
+apitest.py
