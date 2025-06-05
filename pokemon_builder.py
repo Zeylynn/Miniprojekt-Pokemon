@@ -1,10 +1,9 @@
-import api_handler as API
 import pokemon_obj as Pokemon
 import random
 
 class PokemonBuilder:
-    def __init__(self):
-        self.api_handler = API.API_Handler()
+    def __init__(self, handler):
+        self.api_handler = handler  # Damit man den Handler durch einen Fake-Handler ersetzen soll
 
     def build(self, name):
         data = self.api_handler.get_pokemon_data(name)
