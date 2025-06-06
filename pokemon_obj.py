@@ -5,6 +5,8 @@ class Pokemon:
         self.__type = None          # TODO Soll ich doppeltypen unterstützen? => Glaub nicht sonst Liste statt string
         self.__attacks = []
 
+        self.__currenthp = None
+
         # STATS
         self.__hp = None            #1
         self.__attack = None        #2
@@ -15,6 +17,12 @@ class Pokemon:
         
     def get_name(self):
         return self.__name
+
+    def get_currenthp(self):
+        return self.__currenthp
+    
+    def set_currenthp(self, amount):
+        self.__currenthp = amount
 
     def get_sprite(self):
         return self.__sprite
@@ -47,3 +55,15 @@ class Pokemon:
         self.__sp_defense = stats["special-defense"]
         self.__speed = stats["speed"]
         self.__attacks = attacks
+        self.__currenthp = self.__hp
+
+        
+    def __str__(self):
+        stats = self.get_stats()
+        return (
+            f"{self.get_name()} | Typen: {', '.join(self.get_type())}\n"
+            f"  HP: {stats['HP']}, Atk: {stats['Attack']}, Def: {stats['Defense']}, "
+            f"SpAtk: {stats['Sp. Attack']}, SpDef: {stats['Sp. Defense']}, Speed: {stats['Speed']}\n"
+            f"  Attacken: {', '.join(self.get_attacks())}"
+        )
+    __repr__ = __str__
