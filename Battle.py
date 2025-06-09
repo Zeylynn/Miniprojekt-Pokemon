@@ -29,68 +29,85 @@ class Kampf:
             return random.choice([1, 2])
 
     def start(self):
-        self.pokemon1 = self.trainerHost[0]
-        self.pokemon2 = self.trainerClient[0]
+        self.pokemon1 = self.get_next_alive(self.trainerHost)
+        self.pokemon2 = self.get_next_alive(self.trainerClient)
 
-        x = self.show_teams()
-
-        attacker1 = self.pokemon1
-        attacker2 = self.pokemon2
+        self.show_teams()
 
         while True:
-             
-            Who = self.bestimme_angreifer()
+            if not self.team_alive(self.trainerHost):
+                print("TrainerClient gewinnt!")
+                break
+            if not self.team_alive(self.trainerClient):
+                print("TrainerHost gewinnt!")
+                break
+
+            who = self.bestimme_angreifer()
             print("\n")
             self.display_status()
 
-            Attacke = self.attack(attacker1, attacker2, Who)
-            Which = int(input("Welches Pokemon für den nächsten Angriff: "))
-            self.pokemon1 = self.trainerHost[Which-1]
-            attacker1 = self.pokemon1
-
-            if Who == 1:
-                Who = 2
+            if who == 1:
+                self.attack(self.pokemon1, self.pokemon2, self.trainerHost, is_host=True)
+                if self.pokemon2.get_currenthp() <= 0:
+                    self.pokemon2 = self.get_next_alive(self.trainerClient)
             else:
-                Who = 1 
+                self.attack(self.pokemon2, self.pokemon1, self.trainerClient, is_host=False)
+                if self.pokemon1.get_currenthp() <= 0:
+                    self.pokemon1 = self.get_next_alive(self.trainerHost)
 
-            Attacke = self.attack(attacker1, attacker2, Who)
-            Which = int(input("Welches Pokemon für den nächsten Angriff"))
-            self.pokemon2 = self.trainerClient[Which-1]
-            attacker2 = self.pokemon2
+    def attack(self, attacker, defender, team, is_host):
+        pokemon, move = self.choose_action(attacker, team)
 
-    def attack(self, attacker1, attacker2, line):
-        if line == 1:
-            move1 = self.choose_attack(attacker1)
-            damage1 = self.calculate_damage(attacker1, attacker2, move1)
-            self.apply_damage(attacker2, damage1)
-            print(f"{attacker1.get_name()} greift mit {move1} an und verursacht {damage1} Schaden!")
+        if pokemon != attacker:
+            if is_host:
+                self.pokemon1 = pokemon
+            else:
+                self.pokemon2 = pokemon
+            print(f"{attacker.get_name()} wurde ausgewechselt zu {pokemon.get_name()}.\n")
+            return
 
-            if attacker2.get_currenthp() <= 0:
-                print(f"{attacker2.get_name()} wurde besiegt! {attacker1.get_name()} gewinnt!\n")
+        if move:
+            damage = self.calculate_damage(attacker, defender, move)
+            self.apply_damage(defender, damage)
+            print(f"{attacker.get_name()} greift mit {move} an und verursacht {damage} Schaden!")
 
-        elif line == 2:
-            move2 = self.choose_attack(attacker2)
-            damage2 = self.calculate_damage(attacker2, attacker1, move2)
-            self.apply_damage(attacker1, damage2)
-            print(f"{attacker2.get_name()} greift mit {move2} an und verursacht {damage2} Schaden!")
+            if defender.get_currenthp() <= 0:
+                print(f"{defender.get_name()} wurde besiegt!\n")
 
-            if attacker1.get_currenthp() <= 0:
-                print(f"{attacker1.get_name()} wurde besiegt! {attacker2.get_name()} gewinnt!\n")
+    def choose_action(self, pokemon, team):
+        print(f"{pokemon.get_name()}, wähle:")
+        for i, move in enumerate(pokemon.get_attacks(), 1):
+            print(f"{i}: Attacke - {move}")
+
+        for i, teammate in enumerate(team, 5):
+            if teammate.get_currenthp() > 0:
+                print(f"{i}: Wechsel zu {teammate.get_name()}")
+
+        while True:
+            choice = input("Wahl (1-4 Attacke, 5-9 Wechsel): ")
+            if choice in ['1', '2', '3', '4']:
+                return pokemon, pokemon.get_attacks()[int(choice) - 1]
+            if choice in ['5', '6', '7', '8', '9']:
+                idx = int(choice) - 5
+                if 0 <= idx < len(team) and team[idx].get_currenthp() > 0:
+                    return team[idx], None
+                else:
+                    print("Dieses Pokémon ist K.O. oder existiert nicht.")
+            else:
+                print("Ungültige Eingabe!")
+
+    def get_next_alive(self, team):
+        for poke in team:
+            if poke.get_currenthp() > 0:
+                return poke
+        return None
+
+    def team_alive(self, team):
+        return any(p.get_currenthp() > 0 for p in team)
 
     def display_status(self):
         print(f"{self.pokemon1.get_name()}: {self.pokemon1.get_currenthp()} HP")
         print(f"{self.pokemon2.get_name()}: {self.pokemon2.get_currenthp()} HP\n")
-
-    def choose_attack(self, pokemon):
-        print(f"{pokemon.get_name()}, wähle eine Attacke:")
-        for i, move in enumerate(pokemon.get_attacks(), 1):
-            print(f"{i}: {move}")
-
-        while True:
-            choice = input("Deine Wahl (1-4): ")
-            if choice in ['1', '2', '3', '4']:
-                return pokemon.get_attacks()[int(choice) - 1]
-            print("Ungültig! Bitte 1-4 eingeben.")
 
     def calculate_damage(self, attacker, defender, move):
         base_attack = attacker.get_stats()["Attack"]
@@ -106,11 +123,12 @@ class Kampf:
     def show_teams(self):
         print("TrainerHost-Team:")
         for i, poke in enumerate(self.trainerHost, 1):
-            print(f"{i}. {poke}")
+            print(f"{i}. {poke.get_name()} - {poke.get_currenthp()} HP")
 
         print("\nTrainerClient-Team:")
         for i, poke in enumerate(self.trainerClient, 1):
-            print(f"{i}. {poke}")
+            print(f"{i}. {poke.get_name()} - {poke.get_currenthp()} HP")
+
 
 kampf = Kampf()
 kampf.start()
